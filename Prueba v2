@@ -1,5 +1,5 @@
 
--- Fast Rebirth Panel Integrado
+-- ðŸ” Fast Rebirth Panel dentro de ContentPanel
 local function fastRebirthScript(container)
     if getgenv().FastRebirthPanel then
         getgenv().FastRebirthPanel:Destroy()
@@ -7,58 +7,57 @@ local function fastRebirthScript(container)
         return
     end
 
-    local a = game:GetService("ReplicatedStorage")
-    local Players = game:GetService("Players")
-    local MainFrame = container:FindFirstAncestorWhichIsA("ScreenGui"):FindFirstChildOfClass("Frame")
-    if not MainFrame then return end
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local ContentPanel = container:FindFirstAncestorWhichIsA("Frame")
 
-    local offsetX = container.AbsolutePosition.X - MainFrame.AbsolutePosition.X + container.AbsoluteSize.X + 5
-    local offsetY = container.AbsolutePosition.Y - MainFrame.AbsolutePosition.Y
+    local offsetX = container.Position.X.Offset + container.Size.X.Offset + 10
+    local offsetY = container.Position.Y.Offset
 
     local panel = Instance.new("Frame")
     panel.Name = "FastRebirthPanel"
     panel.Position = UDim2.new(0, offsetX, 0, offsetY)
-    panel.Size = UDim2.new(0, 200, 0, 120)
+    panel.Size = UDim2.new(0, 200, 0, 110)
     panel.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     panel.BorderSizePixel = 0
-    panel.Parent = MainFrame
+    panel.Parent = ContentPanel
+    panel.ZIndex = 10
     Instance.new("UICorner", panel)
 
     local toggle = Instance.new("TextButton")
-    toggle.Size = UDim2.new(1, -20, 0, 30)
-    toggle.Position = UDim2.new(0, 10, 0, 10)
+    toggle.Size = UDim2.new(0.9, 0, 0, 30)
+    toggle.Position = UDim2.new(0.05, 0, 0, 10)
     toggle.Text = "Iniciar FastRebirth"
     toggle.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
     toggle.TextColor3 = Color3.new(1,1,1)
+    toggle.Font = Enum.Font.GothamBold
+    toggle.TextSize = 14
     toggle.Parent = panel
 
     local status = Instance.new("TextLabel")
-    status.Size = UDim2.new(1, -20, 0, 20)
-    status.Position = UDim2.new(0, 10, 0, 50)
+    status.Size = UDim2.new(0.9, 0, 0, 20)
+    status.Position = UDim2.new(0.05, 0, 0, 50)
     status.Text = "Estado: Detenido"
     status.BackgroundTransparency = 1
     status.TextColor3 = Color3.new(1,1,1)
+    status.Font = Enum.Font.Gotham
+    status.TextSize = 12
     status.Parent = panel
 
     local running = false
     toggle.MouseButton1Click:Connect(function()
         running = not running
+        toggle.Text = running and "Detener FastRebirth" or "Iniciar FastRebirth"
+        status.Text = running and "Estado: En ejecuciÃ³n" or "Estado: Detenido"
+
         if running then
-            toggle.Text = "Detener FastRebirth"
-            status.Text = "Estado: En ejecuciÃ³n"
             task.spawn(function()
                 while running do
                     for i = 1, 10 do
-                        a.rEvents.rebirthRemote:InvokeServer("rebirthRequest")
+                        ReplicatedStorage.rEvents.rebirthRemote:InvokeServer("rebirthRequest")
                         task.wait(0.1)
                     end
                 end
-                toggle.Text = "Iniciar FastRebirth"
-                status.Text = "Estado: Detenido"
             end)
-        else
-            toggle.Text = "Iniciar FastRebirth"
-            status.Text = "Estado: Detenido"
         end
     end)
 
