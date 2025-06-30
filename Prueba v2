@@ -1,94 +1,69 @@
 
--- ðŸ§ª Fast Rebirth Debug Panel - asegurado y rastreado
-local ContentPanel = nil
-
-task.defer(function()
-    for _, d in pairs(game.CoreGui:GetDescendants()) do
-        if d:IsA("Frame") and d.Name == "ContentPanel" then
-            ContentPanel = d
-        end
-    end
-end)
-
+-- âœ… Panel Fast Rebirth asegurado dentro de ContentPanel
 local function fastRebirthScript(container)
-    print("[FastRebirth] BotÃ³n presionado")
-
     if getgenv().FastRebirthPanel then
         getgenv().FastRebirthPanel:Destroy()
         getgenv().FastRebirthPanel = nil
-        print("[FastRebirth] Panel eliminado")
         return
     end
 
     local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local ContentPanel = container:FindFirstAncestorWhichIsA("Frame")
 
-    task.defer(function()
-        if not ContentPanel then
-            warn("[FastRebirth] No se encontrÃ³ ContentPanel")
-            return
-        end
+    local offsetX = container.Position.X.Offset + container.Size.X.Offset + 10
+    local offsetY = container.Position.Y.Offset
 
-        local offsetX = container.Position.X.Offset + container.Size.X.Offset + 10
-        local offsetY = container.Position.Y.Offset
+    local panel = Instance.new("Frame")
+    panel.Name = "FastRebirthPanel"
+    panel.Position = UDim2.new(0, offsetX, 0, offsetY)
+    panel.Size = UDim2.new(0, 250, 0, 100)
+    panel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    panel.BorderSizePixel = 0
+    panel.Visible = true
+    panel.Active = true
+    panel.Parent = ContentPanel
 
-        print("[FastRebirth] PosiciÃ³n calculada:", offsetX, offsetY)
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = panel
 
-        local panel = Instance.new("Frame")
-        panel.Name = "FastRebirthPanel"
-        panel.Position = UDim2.new(0, offsetX, 0, offsetY)
-        panel.Size = UDim2.new(0, 250, 0, 100)
-        panel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        panel.BorderSizePixel = 0
-        panel.Visible = true
-        panel.Active = true
-        panel.Parent = ContentPanel
-        print("[FastRebirth] Panel creado")
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 25)
+    title.Position = UDim2.new(0, 0, 0, 0)
+    title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    title.Text = "âš¡ Fast Rebirth"
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 16
+    title.Parent = panel
 
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 8)
-        corner.Parent = panel
+    local toggle = Instance.new("TextButton")
+    toggle.Size = UDim2.new(0.9, 0, 0, 30)
+    toggle.Position = UDim2.new(0.05, 0, 0, 35)
+    toggle.Text = "Iniciar Fast Rebirth"
+    toggle.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    toggle.Font = Enum.Font.Gotham
+    toggle.TextSize = 14
+    toggle.Parent = panel
 
-        local title = Instance.new("TextLabel")
-        title.Size = UDim2.new(1, 0, 0, 25)
-        title.Position = UDim2.new(0, 0, 0, 0)
-        title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        title.Text = "âš¡ Fast Rebirth"
-        title.TextColor3 = Color3.fromRGB(255, 255, 255)
-        title.Font = Enum.Font.GothamBold
-        title.TextSize = 16
-        title.Parent = panel
-
-        local toggle = Instance.new("TextButton")
-        toggle.Size = UDim2.new(0.9, 0, 0, 30)
-        toggle.Position = UDim2.new(0.05, 0, 0, 35)
-        toggle.Text = "Iniciar Fast Rebirth"
-        toggle.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
-        toggle.Font = Enum.Font.Gotham
-        toggle.TextSize = 14
-        toggle.Parent = panel
-
-        local running = false
-        toggle.MouseButton1Click:Connect(function()
-            running = not running
-            toggle.Text = running and "Detener Fast Rebirth" or "Iniciar Fast Rebirth"
-            if running then
-                print("[FastRebirth] Loop iniciado")
-                task.spawn(function()
-                    while running do
-                        for i = 1, 10 do
-                            ReplicatedStorage.rEvents.rebirthRemote:InvokeServer("rebirthRequest")
-                            task.wait(0.1)
-                        end
+    local running = false
+    toggle.MouseButton1Click:Connect(function()
+        running = not running
+        toggle.Text = running and "Detener Fast Rebirth" or "Iniciar Fast Rebirth"
+        if running then
+            task.spawn(function()
+                while running do
+                    for i = 1, 10 do
+                        ReplicatedStorage.rEvents.rebirthRemote:InvokeServer("rebirthRequest")
+                        task.wait(0.1)
                     end
-                end)
-            else
-                print("[FastRebirth] Loop detenido")
-            end
-        end)
-
-        getgenv().FastRebirthPanel = panel
+                end
+            end)
+        end
     end)
+
+    getgenv().FastRebirthPanel = panel
 end
 
 
@@ -320,6 +295,10 @@ end)
 
 -- AnimaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬ ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n del indicador
 local function animateIndicator(indicator, isActive)
+
+            if name == "Fast Rebith" then
+                fastRebirthScript(container)
+            end
     local goalColor = isActive and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 50, 50)
     local goalText = isActive and "âœ“" or "X"
     indicator.Text = goalText
@@ -407,10 +386,18 @@ local y = 10
 
         animateIndicator(indicator, isActive)
 
+            if name == "Fast Rebith" then
+                fastRebirthScript(container)
+            end
+
         btn.MouseButton1Click:Connect(function()
             isActive = not isActive
             buttonStates[key] = isActive
             animateIndicator(indicator, isActive)
+
+            if name == "Fast Rebith" then
+                fastRebirthScript(container)
+            end
 
             if name == "Check Stats" then
                 statsPanel.Visible = not statsPanel.Visible
